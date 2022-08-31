@@ -1,5 +1,8 @@
 using ExpenseTracker.Data;
 using ExpenseTracker.Data.Entities;
+using ExpenseTracker.Services;
+using ExpenseTracker.Services.Config;
+using ExpenseTracker.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +22,17 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
 	.AddEntityFrameworkStores<ExpenseTrackerDbContext>()
 	.AddDefaultTokenProviders();
 
+var tokenSection = builder.Configuration.GetSection("Token");
+var tokenConfig = tokenSection.Get<TokenConfig>();
+builder.Services.Configure<TokenConfig>(tokenSection);
+
 builder.Services.AddAuthentication(x =>
 {
 	x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 	x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(o =>
 {
-	var Key = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]);
+	var key = Encoding.UTF8.GetBytes(tokenConfig.Key);
 	o.SaveToken = true;
 	o.TokenValidationParameters = new TokenValidationParameters
 	{
@@ -33,9 +40,9 @@ builder.Services.AddAuthentication(x =>
 		ValidateAudience = false,
 		ValidateLifetime = true,
 		ValidateIssuerSigningKey = true,
-		ValidIssuer = builder.Configuration["JWT:Issuer"],
-		ValidAudience = builder.Configuration["JWT:Audience"],
-		IssuerSigningKey = new SymmetricSecurityKey(Key)
+		ValidIssuer = tokenConfig.Issuer,
+		ValidAudience = tokenConfig.Audience,
+		IssuerSigningKey = new SymmetricSecurityKey(key)
 	};
 });
 
@@ -48,6 +55,10 @@ builder.Services.AddCors(c =>
 	 });
 
 });
+
+builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<ITokenHandlerService, TokenHandlerService>();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
