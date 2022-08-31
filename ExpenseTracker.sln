@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseTracker.Web", "ExpenseTracker.Web\ExpenseTracker.Web.csproj", "{9201C616-9C8C-4472-9C76-C0B61C71C332}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpenseTracker.Web", "ExpenseTracker.Web\ExpenseTracker.Web.csproj", "{9201C616-9C8C-4472-9C76-C0B61C71C332}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseTracker.Data", "ExpenseTracker.Data\ExpenseTracker.Data.csproj", "{0879308E-A612-4C21-AC2B-9A80512E762C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpenseTracker.Data", "ExpenseTracker.Data\ExpenseTracker.Data.csproj", "{0879308E-A612-4C21-AC2B-9A80512E762C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpenseTracker.Services", "ExpenseTracker.Services\ExpenseTracker.Services.csproj", "{3EEF8310-E0F9-490F-A482-391D2704227D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpenseTracker.Common", "ExpenseTracker.Common\ExpenseTracker.Common.csproj", "{5734D9AD-0D10-48B0-85D1-CAFB5B1EAFBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{0879308E-A612-4C21-AC2B-9A80512E762C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0879308E-A612-4C21-AC2B-9A80512E762C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0879308E-A612-4C21-AC2B-9A80512E762C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EEF8310-E0F9-490F-A482-391D2704227D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EEF8310-E0F9-490F-A482-391D2704227D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EEF8310-E0F9-490F-A482-391D2704227D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EEF8310-E0F9-490F-A482-391D2704227D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5734D9AD-0D10-48B0-85D1-CAFB5B1EAFBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5734D9AD-0D10-48B0-85D1-CAFB5B1EAFBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5734D9AD-0D10-48B0-85D1-CAFB5B1EAFBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5734D9AD-0D10-48B0-85D1-CAFB5B1EAFBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
