@@ -1,6 +1,7 @@
 ﻿
 using ExpenseTracker.Data.Common;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace ExpenseTracker.Data.Entities
 {
@@ -10,6 +11,12 @@ namespace ExpenseTracker.Data.Entities
 		{
 			this.Id = Guid.NewGuid().ToString();
 		}
+
+		[Required]
+		public string FirstName { get; set; }
+
+		[Required]
+		public string LastName { get; set; }
 
 		public long Budget { get; set; }
 
