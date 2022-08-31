@@ -1,5 +1,5 @@
 ﻿using ExpenseTracker.Data.Common;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 
 namespace ExpenseTracker.Data.Entities
 {
