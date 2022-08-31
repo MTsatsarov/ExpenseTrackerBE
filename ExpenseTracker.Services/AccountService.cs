@@ -26,7 +26,7 @@ namespace ExpenseTracker.Services
 
 		public async Task<string> RegisterUser(UserRegisterModel model)
 		{
-			var userExists = await this.userManager.FindByNameAsync(model.Email);
+			var userExists = await this.userManager.FindByEmailAsync(model.Email);
 			if (userExists != null)
 			{
 				throw new InvalidOperationException("Username is already taken");
@@ -36,6 +36,7 @@ namespace ExpenseTracker.Services
 			{
 				Email = model.Email,
 				SecurityStamp = Guid.NewGuid().ToString(),
+				UserName = model.UserName,
 				FirstName = model.FirstName,
 				LastName = model.LastName,
 			};

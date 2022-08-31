@@ -5,6 +5,9 @@ namespace ExpenseTracker.Services.Models
 	public class UserRegisterModel
 	{
 		[Required]
+		public string UserName { get; set; }
+
+		[Required]
 		[StringLength(35,MinimumLength =2)]
 		public string FirstName { get; set; }
 

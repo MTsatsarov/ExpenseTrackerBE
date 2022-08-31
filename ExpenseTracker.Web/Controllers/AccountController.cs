@@ -48,7 +48,7 @@ namespace ExpenseTracker.Web.Controllers
 
 		[HttpPost]
 		[Route("logOut")]
-		public async Task<IActionResult> LogOut(UserLoginModel model)
+		public async Task<IActionResult> LogOut()
 		{
 			try
 			{
