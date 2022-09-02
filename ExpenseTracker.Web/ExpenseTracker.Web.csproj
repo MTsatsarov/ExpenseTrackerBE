@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ExpenseTracker.Data\ExpenseTracker.Data.csproj" />
+    <ProjectReference Include="..\ExpenseTracker.Services\ExpenseTracker.Services.csproj" />
   </ItemGroup>
 
 </Project>
