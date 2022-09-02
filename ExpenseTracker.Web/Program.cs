@@ -84,6 +84,7 @@ builder.Services.AddCors(c =>
 builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services.AddTransient<ITokenHandlerService, TokenHandlerService>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IStoreService, StoreService>();
 
 
 builder.Services.AddControllers();
