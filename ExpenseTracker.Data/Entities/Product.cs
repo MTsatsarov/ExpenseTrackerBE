@@ -9,6 +9,8 @@ namespace ExpenseTracker.Data.Entities
 		public Product()
 		{
 			this.Id = Guid.NewGuid();
+			this.Stores= new HashSet<Store>();
+			this.ExpenseProducts = new HashSet<ExpenseProducts>();
 		}
 
 		[Required]
