@@ -13,12 +13,14 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+//DB
 builder.Services.AddDbContext<ExpenseTrackerDbContext>(opt =>
 opt.UseSqlServer("name=ConnectionStrings:DefaultConnection").UseLazyLoadingProxies());
 
+//Add cache
 builder.Services.AddDistributedMemoryCache();
 
+//Add identity
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
 	.AddEntityFrameworkStores<ExpenseTrackerDbContext>()
 	.AddDefaultTokenProviders();
@@ -31,6 +33,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 	options.Lockout.AllowedForNewUsers = true;
 });
 
+
 builder.Services.Configure<IdentityOptions>(options =>
 {
 	// Default Password settings.
@@ -41,6 +44,8 @@ builder.Services.Configure<IdentityOptions>(options =>
 	options.Password.RequiredLength = 8;
 	options.Password.RequiredUniqueChars = 1;
 });
+
+//Token auth
 var tokenSection = builder.Configuration.GetSection("Token");
 var tokenConfig = tokenSection.Get<TokenConfig>();
 builder.Services.Configure<TokenConfig>(tokenSection);
@@ -75,8 +80,10 @@ builder.Services.AddCors(c =>
 
 });
 
+//Services
 builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services.AddTransient<ITokenHandlerService, TokenHandlerService>();
+builder.Services.AddTransient<IProductService, ProductService>();
 
 
 builder.Services.AddControllers();
