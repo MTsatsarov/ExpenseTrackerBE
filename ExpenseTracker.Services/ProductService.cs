@@ -3,6 +3,7 @@ using ExpenseTracker.Data.Entities;
 using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Services.Models;
 using ExpenseTracker.Services.Models.Products;
+using ExpenseTracker.Services.Utils.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
@@ -22,7 +23,7 @@ namespace ExpenseTracker.Services
 			var product = await this.db.Products.FirstOrDefaultAsync(x => x.Name == model.Name);
 			if (product != null)
 			{
-				throw new InvalidOperationException("Product already exists");
+				throw new BadRequestException("Product already exists");
 			}
 
 			var store = await this.db.Stores.FirstOrDefaultAsync(x => x.Id == model.StoreId);
@@ -50,7 +51,7 @@ namespace ExpenseTracker.Services
 
 			if (product == null)
 			{
-				throw new InvalidOperationException("Product not found.");
+				throw new BadRequestException("Product not found.");
 			}
 
 			product.IsDeleted = true;

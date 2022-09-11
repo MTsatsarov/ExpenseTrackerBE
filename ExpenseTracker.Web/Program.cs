@@ -4,6 +4,7 @@ using ExpenseTracker.Data.Seeding;
 using ExpenseTracker.Services;
 using ExpenseTracker.Services.Config;
 using ExpenseTracker.Services.Interfaces;
+using ExpenseTracker.Services.Utils.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -87,7 +88,7 @@ builder.Services.AddTransient<IProductService, ProductService>();
 builder.Services.AddTransient<IStoreService, StoreService>();
 builder.Services.AddTransient<ITransactionService, TransactionService>();
 
-
+builder.Services.AddTransient<ExceptionHandlerMIddleware, ExceptionHandlerMIddleware>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -107,11 +108,13 @@ using (var serviceScope = app.Services.CreateScope())
 	dbContext.Database.Migrate();
 	new ExpenseTrackerDbSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
 }
-
+app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionHandlerMIddleware>();
 
 app.MapControllers();
 

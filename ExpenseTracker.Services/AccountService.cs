@@ -3,6 +3,7 @@ using ExpenseTracker.Data;
 using ExpenseTracker.Data.Entities;
 using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Services.Models;
+using ExpenseTracker.Services.Utils.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +30,7 @@ namespace ExpenseTracker.Services
 			var userExists = await this.userManager.FindByEmailAsync(model.Email);
 			if (userExists != null)
 			{
-				throw new InvalidOperationException("Username is already taken");
+				throw new BadRequestException("Username is already taken");
 			}
 
 			var user = new ApplicationUser()
@@ -44,14 +45,14 @@ namespace ExpenseTracker.Services
 			var result = await this.userManager.CreateAsync(user, model.Password);
 			if (!result.Succeeded)
 			{
-				throw new InvalidOperationException("User creation failed!");
+				throw new BadRequestException("User creation failed!");
 			}
 
 			var isSucceeded = await userManager.AddToRoleAsync(user, RoleConstants.Client);
 
 			if (!isSucceeded.Succeeded)
 			{
-				throw new InvalidOperationException("User creation failed!");
+				throw new BadRequestException("User creation failed!");
 			}
 			return "User created succesfully";
 		}
@@ -59,7 +60,10 @@ namespace ExpenseTracker.Services
 		public async Task<AuthResponse> LoginUser(UserLoginModel model)
 		{
 			var user = await this.userManager.FindByEmailAsync(model.Email);
-
+			if (user == null)
+			{
+				throw new BadRequestException("Invalid credentials.");
+			}
 			var token = await this.tokenHandlerService.GenerateToken(user);
 			return token;
 		}
@@ -70,7 +74,7 @@ namespace ExpenseTracker.Services
 
 			if (user == null)
 			{
-				throw new InvalidOperationException("Refresh token expired");
+				throw new BadRequestException("Refresh token expired");
 			}
 
 			var dbUser = await this.db.Users.FirstOrDefaultAsync(x => x.Id == user);
@@ -88,7 +92,7 @@ namespace ExpenseTracker.Services
 
 			if (user == null)
 			{
-				throw new InvalidOperationException("User not found");
+				throw new BadRequestException("User not found");
 			}
 
 			var result = await userManager.ChangePasswordAsync(user, oldPassword, newPassword);
@@ -97,7 +101,7 @@ namespace ExpenseTracker.Services
 			{
 				return "User password succesfully updated";
 			}
-			throw new InvalidOperationException("Unable to change user password");
+			throw new BadRequestException("Unable to change user password");
 		}
 
 		public async  Task LogOut(string token)

@@ -3,6 +3,7 @@ using ExpenseTracker.Data;
 using ExpenseTracker.Data.Entities;
 using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Services.Models.Store;
+using ExpenseTracker.Services.Utils.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Services
@@ -21,7 +22,7 @@ namespace ExpenseTracker.Services
 			var store = await this.db.Stores.FirstOrDefaultAsync(x => x.Name == name);
 			if (store != null)
 			{
-				throw new InvalidOperationException("Store name is already taken.");
+				throw new BadRequestException("Store name is already taken.");
 			}
 
 			store = new Store()
@@ -41,7 +42,7 @@ namespace ExpenseTracker.Services
 			var store = await this.db.Stores.FirstOrDefaultAsync(x => x.Id == storeId);
 			if (store == null)
 			{
-				throw new InvalidOperationException("Store not found.");
+				throw new BadRequestException("Store not found.");
 			}
 
 			store.IsDeleted = true;

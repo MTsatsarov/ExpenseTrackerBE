@@ -2,6 +2,7 @@
 using ExpenseTracker.Data.Entities;
 using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Services.Models.Transactions;
+using ExpenseTracker.Services.Utils.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Services
@@ -37,7 +38,7 @@ namespace ExpenseTracker.Services
 					currentProduct = await this.db.Products.FirstOrDefaultAsync(x => x.Id == product.ProductId.Value);
 					if (currentProduct == null)
 					{
-						throw new InvalidOperationException("Invalid product id ");
+						throw new BadRequestException("Invalid product");
 					}
 				}
 				else
