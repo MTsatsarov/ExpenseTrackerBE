@@ -7,7 +7,6 @@ using System.Security.Claims;
 namespace ExpenseTracker.Web.Controllers
 {
 	[ApiController]
-	[Authorize]
 	[Route("api/[controller]")]
 	public class TransactionController : ControllerBase
 	{
@@ -36,6 +35,40 @@ namespace ExpenseTracker.Web.Controllers
 			}
 
 			return this.Ok("Transaction created succesfully.");
+		}
+
+		[HttpGet]
+		[Route("getTransactions")]
+		[Authorize(Roles = "CLIENT")]
+		public async Task<IActionResult> GetTransactions()
+		{
+			var userId = this.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+			if (string.IsNullOrEmpty(userId))
+			{
+				return this.BadRequest("User id missing.");
+			}
+			var result = await this.transactionService.GetTransactions(userId);
+			return this.Ok(result);
+		}
+
+		[HttpGet]
+		[Route("getUserTransactions")]
+		[Authorize(Roles = "ADMIN")]
+		public async Task<IActionResult> GetUserTransactions()
+		{
+			var result = await this.transactionService.GetTransactions(null);
+			return this.Ok(result);
+		}
+
+		[HttpGet]
+		[Route("details")]
+		[Authorize]
+		public async Task<IActionResult> GetDetails(Guid transactionId)
+		{
+			var result = await this.transactionService.GetDetails(transactionId);
+
+			return this.Ok(result);
 		}
 	}
 }

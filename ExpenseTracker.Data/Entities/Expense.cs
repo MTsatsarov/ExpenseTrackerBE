@@ -1,5 +1,4 @@
 ﻿using ExpenseTracker.Data.Common;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ExpenseTracker.Data.Entities
 {
