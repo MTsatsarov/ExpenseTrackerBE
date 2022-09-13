@@ -105,13 +105,15 @@ namespace ExpenseTracker.Services
 
 			foreach (var transaction in data)
 			{
-				result.Add(new TransactionResponse()
+				var a = (new TransactionResponse()
 				{
 					CreatedOn = transaction.CreatedOn,
 					Id = transaction.Id,
-					Store = transaction.Stores.FirstOrDefault().Name,
+					//Store = transaction.Stores.FirstOrDefault().Name,
+					Store="My store",
 					TotalPrice = transaction.ExpenseProducts.Sum(x => x.Price * x.Quantity)
 				});
+				result.Add(a);
 			}
 
 			return result;
