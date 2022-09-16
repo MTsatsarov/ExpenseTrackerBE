@@ -10,6 +10,7 @@ namespace ExpenseTracker.Data.Entities
 		public ApplicationUser()
 		{
 			this.Id = Guid.NewGuid().ToString();
+			this.Expenses = new HashSet<Expense>();
 		}
 
 		[Required]

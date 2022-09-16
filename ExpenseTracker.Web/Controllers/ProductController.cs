@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ExpenseTracker.Web.Controllers
 {
 	[ApiController]
-	[Route("api/controller")]
+	[Route("api/[controller]")]
 	public class ProductController : ControllerBase
 	{
 		private readonly IProductService productService;

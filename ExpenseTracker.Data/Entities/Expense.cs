@@ -1,5 +1,4 @@
 ﻿using ExpenseTracker.Data.Common;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ExpenseTracker.Data.Entities
 {
@@ -8,6 +7,8 @@ namespace ExpenseTracker.Data.Entities
 		public Expense()
 		{
 			this.Id = Guid.NewGuid();
+			this.ExpenseProducts = new HashSet<ExpenseProducts>();
+			this.Stores = new HashSet<Store>();
 		}
 
 		public virtual ICollection<ExpenseProducts> ExpenseProducts { get; set; }
