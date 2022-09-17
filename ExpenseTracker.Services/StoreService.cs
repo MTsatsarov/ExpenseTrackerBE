@@ -66,7 +66,7 @@ namespace ExpenseTracker.Services
 					Name = store.Name,
 				});
 			}
-			return storeResponse;
+			return storeResponse.OrderBy(x=>x.Name);
 		}
 	}
 }
