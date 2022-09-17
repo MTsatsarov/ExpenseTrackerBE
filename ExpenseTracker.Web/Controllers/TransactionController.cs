@@ -38,6 +38,16 @@ namespace ExpenseTracker.Web.Controllers
 		}
 
 		[HttpGet]
+		[Route("getDashboardTransactions")]
+		[Authorize(Roles ="CLIENT")]
+		public async Task<IActionResult> GetDashboardTransactions()
+		{
+			var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			var result = await this.transactionService.GetDashboardTransactions(userId);
+			return this.Ok(result);
+		}
+
+		[HttpGet]
 		[Route("getTransactions")]
 		[Authorize(Roles = "CLIENT")]
 		public async Task<IActionResult> GetTransactions()

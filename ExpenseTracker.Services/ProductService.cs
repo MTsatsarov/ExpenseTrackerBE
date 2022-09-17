@@ -63,25 +63,19 @@ namespace ExpenseTracker.Services
 
 		public async Task<IEnumerable<ProductResponse>> GetProducts(string name)
 		{
-			var responseProducts = new List<ProductResponse>();
-			var products = this.db.Products.AsQueryable();
-
-			if (name != null)
+			var products = this.db.Products.Select(x=> new ProductResponse()
 			{
-				products.Where(x => x.Name.Contains(name));
-			}
-			products = (IQueryable<Product>)products.ToList();
-			foreach (var product in products)
-			{
-				var currProduct = new ProductResponse()
-				{
-					Id = product.Id,
-					Name = product.Name,
-				};
-				responseProducts.Add(currProduct);
-			}
+				Id = x.Id,
+				Name = x.Name,
+			}).OrderBy(x=>x.Name);
+			
+			//TODO
+			//if (name != null)
+			//{
+			//	products.Where(x => x.Name.Contains(name));
+			//}
 
-			return responseProducts;
+			return products;
 		}
 	}
 }

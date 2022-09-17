@@ -7,5 +7,7 @@ namespace ExpenseTracker.Services.Interfaces
 		Task<bool> Create(TransactionInputModel model);
 		Task<List<TransactionResponse>> GetTransactions(string userId);
 		Task<TransactionDetails> GetDetails(Guid transactionId);
+
+		Task<DashboardTransactionsResponse> GetDashboardTransactions(string userId);
 	}
 }

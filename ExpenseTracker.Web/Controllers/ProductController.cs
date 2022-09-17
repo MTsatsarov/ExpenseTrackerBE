@@ -19,6 +19,7 @@ namespace ExpenseTracker.Web.Controllers
 
 		[HttpGet]
 		[Authorize]
+		[Route("getProducts")]
 		public async Task<IActionResult> Get([FromQuery] string product)
 		{
 			var products = await this.productService.GetProducts(product);

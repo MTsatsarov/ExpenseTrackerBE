@@ -58,6 +58,7 @@ namespace ExpenseTracker.Services
 				};
 
 				transaction.ExpenseProducts.Add(expenseProduct);
+				transaction.UserId = model.UserId;
 			}
 
 			await this.db.Expenses.AddAsync(transaction);
@@ -65,9 +66,36 @@ namespace ExpenseTracker.Services
 			return result > 0;
 		}
 
+		public async Task<DashboardTransactionsResponse> GetDashboardTransactions(string userId)
+		{
+			var currentMonth = DateTime.UtcNow.Month;
+			var currentYear = DateTime.UtcNow.Year;
+			var response = new  DashboardTransactionsResponse();
+
+			var yearlyTransactions =await this.db.Expenses.Where(x => x.CreatedOn.Year == currentYear && x.UserId == userId).ToListAsync();
+
+			var currentMonthTransactions = yearlyTransactions.Where(x => x.CreatedOn.Month == currentMonth && x.CreatedOn.Year == currentYear);
+
+			var transactionsByDate = currentMonthTransactions.Select(x => new TransactionsByDate()
+			{
+				Day = x.CreatedOn.Day,
+				TotalSum = x.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price))
+			}).ToList();
+
+			var storeTransactions = currentMonthTransactions.Select(x => new TransactionsByStore()
+			{
+				
+			}).ToList();
+
+			var transactionsByMonth =  yearlyTransactions.GroupBy(x => x.CreatedOn.Month).ToList();
+
+			;
+			return response;
+		}
+
 		public async Task<TransactionDetails> GetDetails(Guid id)
 		{
-			var transaction = await this.db.Expenses.Where(x => x.Id == id).FirstOrDefaultAsync() ;
+			var transaction = await this.db.Expenses.Where(x => x.Id == id).FirstOrDefaultAsync();
 
 			if (transaction == null)
 			{
@@ -110,7 +138,7 @@ namespace ExpenseTracker.Services
 					CreatedOn = transaction.CreatedOn,
 					Id = transaction.Id,
 					//Store = transaction.Stores.FirstOrDefault().Name,
-					Store="My store",
+					Store = "My store",
 					TotalPrice = transaction.ExpenseProducts.Sum(x => x.Price * x.Quantity)
 				});
 				result.Add(a);

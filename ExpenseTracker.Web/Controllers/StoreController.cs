@@ -17,6 +17,7 @@ namespace ExpenseTracker.Web.Controllers
 
 		[HttpGet]
 		[Authorize]
+		[Route("getStores")]
 		public async Task<IActionResult> Get()
 		{
 			var result = await this.storeService.GetAllStores();
