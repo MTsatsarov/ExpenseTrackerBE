@@ -3,6 +3,7 @@ using ExpenseTracker.Data;
 using ExpenseTracker.Data.Entities;
 using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Services.Models;
+using ExpenseTracker.Services.Models.User;
 using ExpenseTracker.Services.Utils.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -107,6 +108,25 @@ namespace ExpenseTracker.Services
 		public async  Task LogOut(string token)
 		{
 			await this.tokenHandlerService.RevokeAccessToken(token);
+		}
+
+		public async Task<UserResponse> GetCurrentUser(string id)
+		{
+			var user =await this.db.Users.FirstOrDefaultAsync(x => x.Id == id);
+
+			if (user == null)
+			{
+				throw new BadRequestException("User not found");
+			}
+			// TODO: REFACTOR
+			var role = await this.db.UserRoles.FirstOrDefaultAsync(x => x.UserId == user.Id);
+			var roleName = await this.db.Roles.FirstOrDefaultAsync(x => x.Id == role.RoleId);
+			
+			var response = new UserResponse(user);
+			response.Role = roleName.Name;
+
+			return response;
+
 		}
 	}
 }

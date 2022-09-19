@@ -1,4 +1,5 @@
 ﻿using ExpenseTracker.Services.Models;
+using ExpenseTracker.Services.Models.User;
 
 namespace ExpenseTracker.Services.Interfaces
 {
@@ -13,5 +14,7 @@ namespace ExpenseTracker.Services.Interfaces
 		Task LogOut(string token);
 
 		Task<string> ChangePassword(string userId, string oldPassword, string newPassword);
+
+		Task<UserResponse> GetCurrentUser(string id);
 	}
 }

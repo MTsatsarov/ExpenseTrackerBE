@@ -114,5 +114,15 @@ namespace ExpenseTracker.Web.Controllers
 			return this.Ok(authResponse);
 		}
 
+		[HttpGet]
+		[Route("current")]
+		[Authorize]
+		public async Task<IActionResult> GetCurrentUser()
+		{
+			var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			var result = await this.accountService.GetCurrentUser(userId);
+
+			return this.Ok(result);
+		}
 	}
 }
