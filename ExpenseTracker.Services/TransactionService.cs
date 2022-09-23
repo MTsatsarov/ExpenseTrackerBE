@@ -32,9 +32,17 @@ namespace ExpenseTracker.Services
 			//Refactor
 			var store = await this.db.Stores.FirstOrDefaultAsync(x => x.Name == model.StoreName);
 
+			if (store == null)
+			{
+				throw new BadRequestException("Invalid store");
+			}
+
+			transaction.Stores.Add(store);
+
 			foreach (var product in model.Products)
 			{
 				var currentProduct = new Product();
+				//TODO REMOVE MULTIPLE ADDING OF SAME PRODUCT
 				if (product.ProductId != null)
 				{
 					currentProduct = await this.db.Products.FirstOrDefaultAsync(x => x.Id == product.ProductId.Value);
@@ -45,9 +53,11 @@ namespace ExpenseTracker.Services
 				}
 				else
 				{
+
 					currentProduct.Name = product.Name;
 					currentProduct.Stores.Add(store);
 					await this.db.Products.AddAsync(currentProduct);
+					await this.db.SaveChangesAsync();
 				}
 
 				var expenseProduct = new ExpenseProducts()
@@ -137,8 +147,7 @@ namespace ExpenseTracker.Services
 				{
 					CreatedOn = transaction.CreatedOn,
 					Id = transaction.Id,
-					//Store = transaction.Stores.FirstOrDefault().Name,
-					Store = "My store",
+					Store = transaction.Stores.FirstOrDefault().Name,
 					TotalPrice = transaction.ExpenseProducts.Sum(x => x.Price * x.Quantity)
 				});
 				result.Add(a);

@@ -72,11 +72,11 @@ namespace ExpenseTracker.Web.Controllers
 		}
 
 		[HttpGet]
-		[Route("details")]
+		[Route("details/{id}")]
 		[Authorize]
-		public async Task<IActionResult> GetDetails(Guid transactionId)
+		public async Task<IActionResult> GetDetails(Guid id)
 		{
-			var result = await this.transactionService.GetDetails(transactionId);
+			var result = await this.transactionService.GetDetails(id);
 
 			return this.Ok(result);
 		}
