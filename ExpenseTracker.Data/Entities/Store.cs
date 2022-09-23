@@ -10,6 +10,7 @@ namespace ExpenseTracker.Data.Entities
 		{
 			this.Id = Guid.NewGuid();
 			this.Products = new HashSet<Product>();
+			this.Expenses = new HashSet<Expense>();
 		}
 
 		[Required]
@@ -19,5 +20,7 @@ namespace ExpenseTracker.Data.Entities
 
 		[InverseProperty("Stores")]
 		public virtual ICollection<Product> Products { get; set; }
+
+		public virtual ICollection<Expense> Expenses { get; set; }
 	}
 }

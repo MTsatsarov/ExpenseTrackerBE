@@ -7,7 +7,7 @@ namespace ExpenseTracker.Services.Models.Transactions
 	{
 		public TransactionInputModel()
 		{
-			this.Products = new List<ProductTransactionModel>();
+			this.Products = new HashSet<ProductTransactionModel>();
 		}
 		public string UserId { get; set; }
 		public ICollection<ProductTransactionModel> Products { get; set; }
