@@ -1,5 +1,6 @@
 ﻿using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Services.Models;
+using ExpenseTracker.Services.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -123,6 +124,17 @@ namespace ExpenseTracker.Web.Controllers
 			var result = await this.accountService.GetCurrentUser(userId);
 
 			return this.Ok(result);
+		}
+
+		[HttpPost]
+		[Route("updateUser")]
+		[Authorize]
+		public async Task<IActionResult>UpdateUser(UserUpdateModel model)
+		{
+			var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			model.Id = userId;
+
+			var result = await this.accountService.UpdateUser(model);		return this.Ok(result);
 		}
 	}
 }

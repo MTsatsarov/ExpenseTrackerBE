@@ -18,7 +18,7 @@ namespace ExpenseTracker.Services
 		private readonly ExpenseTrackerDbContext db;
 
 		public AccountService(UserManager<ApplicationUser> userManager
-			,ITokenHandlerService tokenHandlerService,
+			, ITokenHandlerService tokenHandlerService,
 			ExpenseTrackerDbContext db)
 		{
 			this.userManager = userManager;
@@ -105,14 +105,14 @@ namespace ExpenseTracker.Services
 			throw new BadRequestException("Unable to change user password");
 		}
 
-		public async  Task LogOut(string token)
+		public async Task LogOut(string token)
 		{
 			await this.tokenHandlerService.RevokeAccessToken(token);
 		}
 
 		public async Task<UserResponse> GetCurrentUser(string id)
 		{
-			var user =await this.db.Users.FirstOrDefaultAsync(x => x.Id == id);
+			var user = await this.db.Users.FirstOrDefaultAsync(x => x.Id == id);
 
 			if (user == null)
 			{
@@ -121,12 +121,34 @@ namespace ExpenseTracker.Services
 			// TODO: REFACTOR
 			var role = await this.db.UserRoles.FirstOrDefaultAsync(x => x.UserId == user.Id);
 			var roleName = await this.db.Roles.FirstOrDefaultAsync(x => x.Id == role.RoleId);
-			
+
 			var response = new UserResponse(user);
 			response.Role = roleName.Name;
 
 			return response;
 
+		}
+
+		public async Task<string> UpdateUser(UserUpdateModel model)
+		{
+			var user = await this.db.Users.FirstOrDefaultAsync(x => x.Id == model.Id);
+
+			if (user == null)
+			{
+				throw new BadRequestException("User not found");
+			}
+
+			user.FirstName = model.FirstName;
+			user.LastName = model.LastName;
+			this.db.Users.Update(user);
+			var result = await this.db.SaveChangesAsync();
+
+			if (result == 1)
+			{
+				return "User updated succesfully.";
+			}
+
+			return "Unable to update. Please try again later. If the problem persists contact with your administrator.";
 		}
 	}
 }

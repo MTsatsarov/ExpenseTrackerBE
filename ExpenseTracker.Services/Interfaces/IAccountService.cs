@@ -16,5 +16,7 @@ namespace ExpenseTracker.Services.Interfaces
 		Task<string> ChangePassword(string userId, string oldPassword, string newPassword);
 
 		Task<UserResponse> GetCurrentUser(string id);
+
+		Task<string> UpdateUser(UserUpdateModel model);
 	}
 }
