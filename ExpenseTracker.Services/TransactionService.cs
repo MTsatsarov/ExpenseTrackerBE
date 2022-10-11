@@ -5,6 +5,8 @@ using ExpenseTracker.Services.Models.Products;
 using ExpenseTracker.Services.Models.Transactions;
 using ExpenseTracker.Services.Utils.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.Linq;
 
 namespace ExpenseTracker.Services
 {
@@ -80,26 +82,58 @@ namespace ExpenseTracker.Services
 		{
 			var currentMonth = DateTime.UtcNow.Month;
 			var currentYear = DateTime.UtcNow.Year;
-			var response = new  DashboardTransactionsResponse();
+			var response = new DashboardTransactionsResponse();
 
-			var yearlyTransactions =await this.db.Expenses.Where(x => x.CreatedOn.Year == currentYear && x.UserId == userId).ToListAsync();
-
-			var currentMonthTransactions = yearlyTransactions.Where(x => x.CreatedOn.Month == currentMonth && x.CreatedOn.Year == currentYear);
-
-			var transactionsByDate = currentMonthTransactions.Select(x => new TransactionsByDate()
+			var yearlyTransactions = await this.db.Expenses.Where(x => x.CreatedOn.Year == currentYear && x.UserId == userId).ToListAsync();
+			foreach (var transaction in yearlyTransactions)
 			{
-				Day = x.CreatedOn.Day,
-				TotalSum = x.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price))
-			}).ToList();
-
-			var storeTransactions = currentMonthTransactions.Select(x => new TransactionsByStore()
-			{
+				var currenTransaction = response.LastYearTransactions.FirstOrDefault(x => x.Month == transaction.CreatedOn.ToString("MMMM", CultureInfo.InvariantCulture));
+				if (currenTransaction != null)
+				{
+					currenTransaction.Sum += transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
+				}
 				
-			}).ToList();
+			}
 
-			var transactionsByMonth =  yearlyTransactions.GroupBy(x => x.CreatedOn.Month).ToList();
+			var currentMonthTransactions = yearlyTransactions.Where(x => x.CreatedOn.Month == currentMonth).ToList();
 
-			;
+			for (int i = 1; i <= 31; i++)
+			{
+				response.CurrentMonthTransactions.Add(new TransactionsByDate()
+				{
+					Name = i.ToString(),
+				});
+			}
+
+			foreach (var transaction in currentMonthTransactions)
+			{
+				var currentTransaction = response.CurrentMonthTransactions.FirstOrDefault(x => int.Parse(x.Name) == transaction.CreatedOn.Day);
+				currentTransaction.Sum = transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
+			}
+
+			var storeTransactions = new Dictionary<string, int>();
+
+			foreach (var expense in yearlyTransactions)
+			{
+				var currStore = expense.Stores.FirstOrDefault().Name;
+
+				if (!storeTransactions.ContainsKey(currStore))
+				{
+					storeTransactions.Add(currStore, 0);
+				}
+				storeTransactions[currStore] += 1;
+			}
+			var transactions = storeTransactions.OrderByDescending(x => x.Value).Take(5).ToDictionary(x => x.Key, x => x.Value);
+
+			foreach (var transaction in transactions)
+			{
+				response.TransactionsByStore.Add(new TransactionByStore()
+				{
+					Name = transaction.Key,
+					Count = transaction.Value,
+				});
+			}
+
 			return response;
 		}
 
@@ -131,17 +165,10 @@ namespace ExpenseTracker.Services
 
 		public async Task<List<TransactionResponse>> GetTransactions(string userId)
 		{
-			var transactions = this.db.Expenses;
+			var transactions = await this.db.Expenses.Where(x => x.UserId == userId).ToListAsync();
 			var result = new List<TransactionResponse>();
 
-			if (!string.IsNullOrEmpty(userId))
-			{
-				transactions.Where(x => x.UserId == userId);
-			}
-
-			var data = await transactions.ToListAsync();
-
-			foreach (var transaction in data)
+			foreach (var transaction in transactions)
 			{
 				var a = (new TransactionResponse()
 				{
