@@ -8,32 +8,93 @@ namespace ExpenseTracker.Services.Models.Transactions
 {
 	public class DashboardTransactionsResponse
 	{
-		public IEnumerable<TransactionsByDate> CurrentMonthTransactions { get; set; }
+		public DashboardTransactionsResponse()
+		{
+			TransactionsByStore = new List<TransactionByStore>();
+			CurrentMonthTransactions= new List<TransactionsByDate>();
+			LastYearTransactions = MapProperties().ToList();
+		}
+		public List<TransactionsByDate> CurrentMonthTransactions { get; set; }
 
-		public IEnumerable<LastYearTransactions> LastYearTransactions { get; set; }
+		public ICollection<LastYearTransactions> LastYearTransactions { get; set; }
 
-		public IEnumerable<TransactionsByStore> TransactionsByStore { get; set; }
+		public ICollection<TransactionByStore> TransactionsByStore { get; set; }
+
+		private List<LastYearTransactions> MapProperties()
+		{
+			var list =new List<LastYearTransactions>()
+			{
+				new LastYearTransactions()
+				{
+					Month = "January"
+				},
+				new LastYearTransactions()
+				{
+					Month = "February"
+				},
+				new LastYearTransactions()
+				{
+					Month = "March"
+				},
+				new LastYearTransactions()
+				{
+					Month = "April"
+				},
+				new LastYearTransactions()
+				{
+					Month = "May"
+				},
+				new LastYearTransactions()
+				{
+					Month = "June"
+				},
+				new LastYearTransactions()
+				{
+					Month = "July"
+				},
+				new LastYearTransactions()
+				{
+					Month = "August"
+				},
+				new LastYearTransactions()
+				{
+					Month = "September"
+				},
+				new LastYearTransactions()
+				{
+					Month = "October"
+				},
+				new LastYearTransactions()
+				{
+					Month = "November"
+				},
+				new LastYearTransactions()
+				{
+					Month = "December"
+				},
+			};
+			return list;
+		}
 	}
 
 	public class TransactionsByDate
 	{
-		public int Day { get; set; }
-		public decimal TotalSum { get; set; }
+		public string Name { get; set; }
+		public decimal Sum { get; set; }
 	}
 
 	public class LastYearTransactions
 	{
 		public string Month { get; set; }
 
-		public decimal TotalSum { get; set; }
+		public decimal Sum { get; set; }
 
 	}
 
-	public class TransactionsByStore
+	public class TransactionByStore
 	{
-		public string Store { get; set; }
+		public string Name { get; set; }
 
-		public int TotalTransactins { get; set; }
+		public int Count { get; set; }
 	}
-
 }
