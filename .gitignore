@@ -4,10 +4,6 @@ obj
 obj*
 bin*
 
-appSettings.json/
-*appSettings.json
-appSettings.json*
-
 
 .vs/
 
