@@ -161,5 +161,35 @@ namespace ExpenseTracker.Services
 
 			return "Unable to update. Please try again later. If the problem persists contact with your administrator.";
 		}
+
+		public async  Task AddUser(RegisterEmployeeModel model, Organization organization)
+		{
+			var userExists = await this.userManager.FindByEmailAsync(model.Email);
+
+			if (userExists != null)
+			{
+				throw new BadRequestException("Unable to create employee.");
+			}
+
+			var user = new ApplicationUser()
+			{
+				Email = model.Email,
+				SecurityStamp = Guid.NewGuid().ToString(),
+				UserName = model.UserName,
+				FirstName = model.FirstName,
+				LastName = model.LastName,
+				Organization = organization,
+				OrganizationId = organization.Id
+			};
+
+			var result = await this.userManager.CreateAsync(user, model.Password);
+
+			if (!result.Succeeded)
+			{
+				throw new BadRequestException("Unable to create employee.");
+			}
+			var isOwner = await userManager.AddToRoleAsync(user, RoleConstants.Employee);
+
+		}
 	}
 }
