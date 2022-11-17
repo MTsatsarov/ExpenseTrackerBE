@@ -10,7 +10,7 @@ namespace ExpenseTracker.Data
 		{
 			var configuration = new ConfigurationBuilder()
 				 .SetBasePath(Directory.GetCurrentDirectory())
-				 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+				 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
 				 .Build();
 
 			var builder = new DbContextOptionsBuilder<ExpenseTrackerDbContext>();
