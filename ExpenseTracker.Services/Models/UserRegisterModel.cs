@@ -8,7 +8,7 @@ namespace ExpenseTracker.Services.Models
 		public string UserName { get; set; }
 
 		[Required]
-		[StringLength(35,MinimumLength =2)]
+		[StringLength(35, MinimumLength = 2)]
 		public string FirstName { get; set; }
 
 		[Required]
@@ -19,7 +19,11 @@ namespace ExpenseTracker.Services.Models
 		public string Password { get; set; }
 
 		[Required]
-		public string Email{ get; set; }
+		public string Email { get; set; }
+
+		[Required]
+		[StringLength(50, MinimumLength = 2)]
+		public string Organization { get; set; }
 
 	}
 }

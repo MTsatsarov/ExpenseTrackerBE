@@ -13,8 +13,9 @@ namespace ExpenseTracker.Data.Seeding.Seeders
 
             await SeedRoleAsync(roleManager, RoleConstants.Client);
             await SeedRoleAsync(roleManager, RoleConstants.Admin);
+            await SeedRoleAsync(roleManager, RoleConstants.Owner);
 
-        }
+		}
         private static async Task SeedRoleAsync(RoleManager<ApplicationRole> roleManager, string roleName)
         {
             var role = await roleManager.FindByNameAsync(roleName);

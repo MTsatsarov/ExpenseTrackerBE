@@ -5,5 +5,7 @@ namespace ExpenseTracker.Common
 	{
 		public static string Client => "CLIENT";
 		public static string Admin => "ADMIN";
+
+		public static string Owner => "OWNER";
 	}
 }

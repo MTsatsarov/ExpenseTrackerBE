@@ -67,6 +67,7 @@ namespace ExpenseTracker.Web.Controllers
 		[Authorize(Roles = "ADMIN")]
 		public async Task<IActionResult> GetUserTransactions()
 		{
+			// WHY USERID is null ????
 			var result = await this.transactionService.GetTransactions(null);
 			return this.Ok(result);
 		}

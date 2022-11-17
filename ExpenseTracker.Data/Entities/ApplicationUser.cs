@@ -29,6 +29,10 @@ namespace ExpenseTracker.Data.Entities
 
 		public DateTime? ModifiedOn { get; set; }
 
+		public Guid OrganizationId { get; set; }
+
+		public virtual Organization Organization { get; set; }
+
 		public virtual ICollection<Expense> Expenses { get; set; }
 
 		public virtual ICollection<IdentityUserRole<string>> Roles { get; set; }

@@ -1,4 +1,5 @@
-﻿using ExpenseTracker.Data;
+﻿using ExpenseTracker.Common;
+using ExpenseTracker.Data;
 using ExpenseTracker.Data.Entities;
 using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Services.Models.Products;
@@ -26,52 +27,85 @@ namespace ExpenseTracker.Services
 		public async Task<bool> Create(TransactionInputModel model)
 		{
 			var transaction = new Expense();
-			if (model.StoreId == null)
+			if (model.Type == ExpenseTypeConstants.Product)
 			{
-				await this.storeService.CreateStore(model.StoreName);
-			}
-
-			//Refactor
-			var store = await this.db.Stores.FirstOrDefaultAsync(x => x.Name == model.StoreName);
-
-			if (store == null)
-			{
-				throw new BadRequestException("Invalid store");
-			}
-
-			transaction.Stores.Add(store);
-
-			foreach (var product in model.Products)
-			{
-				var currentProduct = new Product();
-				//TODO REMOVE MULTIPLE ADDING OF SAME PRODUCT
-				if (product.ProductId != null)
+				if (model.StoreId == null)
 				{
-					currentProduct = await this.db.Products.FirstOrDefaultAsync(x => x.Id == product.ProductId.Value);
-					if (currentProduct == null)
+					await this.storeService.CreateStore(model.StoreName);
+				}
+
+				//Refactor
+				var store = await this.db.Stores.FirstOrDefaultAsync(x => x.Name == model.StoreName);
+
+				if (store == null)
+				{
+					throw new BadRequestException("Invalid store");
+				}
+
+				transaction.Stores.Add(store);
+
+				foreach (var product in model.Products)
+				{
+					var currentProduct = new Product();
+
+					//TODO REMOVE MULTIPLE ADDING OF SAME PRODUCT
+					if (product.ProductId != null)
 					{
-						throw new BadRequestException("Invalid product");
+						currentProduct = await this.db.Products.FirstOrDefaultAsync(x => x.Id == product.ProductId.Value);
+						if (currentProduct == null)
+						{
+							throw new BadRequestException("Invalid product");
+						}
 					}
+					else
+					{
+
+						currentProduct.Name = product.Name;
+						currentProduct.Stores.Add(store);
+						await this.db.Products.AddAsync(currentProduct);
+						await this.db.SaveChangesAsync();
+					}
+
+					var expenseProduct = new ExpenseProducts()
+					{
+						Price = product.Price,
+						Quantity = product.Quantity,
+						ProductId = currentProduct.Id,
+					};
+
+					transaction.ExpenseProducts.Add(expenseProduct);
+					transaction.UserId = model.UserId;
+				}
+			}
+			else if (model.Type == ExpenseTypeConstants.Service)
+			{
+				var service = new Service();
+
+				if (model.ServiceId == null)
+				{
+					service.Name = model.ServiceName;
+
 				}
 				else
 				{
-
-					currentProduct.Name = product.Name;
-					currentProduct.Stores.Add(store);
-					await this.db.Products.AddAsync(currentProduct);
-					await this.db.SaveChangesAsync();
+					service = await this.db.Services.FirstOrDefaultAsync(x => x.Id == model.ServiceId);
 				}
 
-				var expenseProduct = new ExpenseProducts()
+				var expenseService = new ExpenseServices()
 				{
-					Price = product.Price,
-					Quantity = product.Quantity,
-					ProductId = currentProduct.Id,
+					Service = service,
+					Price = model.ServicePrice.Value,
 				};
 
-				transaction.ExpenseProducts.Add(expenseProduct);
-				transaction.UserId = model.UserId;
+				transaction.ExpenseService = expenseService;
 			}
+			else
+			{
+				throw new BadRequestException("Invalid type of the expense");
+			}
+
+			transaction.Organization = this.db.Organizations.FirstOrDefault(o => o.Users.Any(x => x.Id == model.UserId));
+			transaction.Type = model.Type;
 
 			await this.db.Expenses.AddAsync(transaction);
 			var result = await this.db.SaveChangesAsync();
@@ -83,16 +117,31 @@ namespace ExpenseTracker.Services
 			var currentMonth = DateTime.UtcNow.Month;
 			var currentYear = DateTime.UtcNow.Year;
 			var response = new DashboardTransactionsResponse();
+			var organization = await this.db.Organizations.FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == userId));
 
-			var yearlyTransactions = await this.db.Expenses.Where(x => x.CreatedOn.Year == currentYear && x.UserId == userId).ToListAsync();
+			if (organization is null)
+			{
+				throw new BadRequestException("Something went wrong.");
+			}
+
+			var yearlyTransactions = await this.db.Expenses.Where(x => x.CreatedOn.Year == currentYear && 
+			x.Organization == organization ).ToListAsync();
+
 			foreach (var transaction in yearlyTransactions)
 			{
 				var currenTransaction = response.LastYearTransactions.FirstOrDefault(x => x.Month == transaction.CreatedOn.ToString("MMMM", CultureInfo.InvariantCulture));
 				if (currenTransaction != null)
 				{
-					currenTransaction.Sum += transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
+					if (transaction.Type == ExpenseTypeConstants.Product)
+					{
+						currenTransaction.Sum += transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
+					}
+					else
+					{
+						currenTransaction.Sum += transaction.ExpenseService.Price;
+					}
 				}
-				
+
 			}
 
 			var currentMonthTransactions = yearlyTransactions.Where(x => x.CreatedOn.Month == currentMonth).ToList();
@@ -108,7 +157,16 @@ namespace ExpenseTracker.Services
 			foreach (var transaction in currentMonthTransactions)
 			{
 				var currentTransaction = response.CurrentMonthTransactions.FirstOrDefault(x => int.Parse(x.Name) == transaction.CreatedOn.Day);
-				currentTransaction.Sum = transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
+
+				if (transaction.Type == ExpenseTypeConstants.Product)
+				{
+					currentTransaction.Sum = transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
+				}
+				else
+				{
+					currentTransaction.Sum = transaction.ExpenseService.Price;
+				}
+
 			}
 
 			var storeTransactions = new Dictionary<string, int>();
@@ -165,7 +223,8 @@ namespace ExpenseTracker.Services
 
 		public async Task<List<TransactionResponse>> GetTransactions(string userId)
 		{
-			var transactions = await this.db.Expenses.Where(x => x.UserId == userId).ToListAsync();
+			var organization = await this.db.Organizations.FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == userId));
+			var transactions = await this.db.Expenses.Where(x => x.Organization == organization).ToListAsync();
 			var result = new List<TransactionResponse>();
 
 			foreach (var transaction in transactions)
@@ -175,8 +234,16 @@ namespace ExpenseTracker.Services
 					CreatedOn = transaction.CreatedOn,
 					Id = transaction.Id,
 					Store = transaction.Stores.FirstOrDefault().Name,
-					TotalPrice = transaction.ExpenseProducts.Sum(x => x.Price * x.Quantity)
 				});
+
+				if (transaction.Type == ExpenseTypeConstants.Product)
+				{
+					a.TotalPrice = transaction.ExpenseProducts.Sum(x => x.Price * x.Quantity);
+				}
+				else
+				{
+					a.TotalPrice = transaction.ExpenseService.Price;
+				}
 				result.Add(a);
 			}
 

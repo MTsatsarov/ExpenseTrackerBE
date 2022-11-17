@@ -4,6 +4,7 @@ using ExpenseTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpenseTracker.Data.Migrations
 {
     [DbContext(typeof(ExpenseTrackerDbContext))]
-    partial class ExpenseTrackerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221015192900_Services")]
+    partial class Services
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -134,9 +136,6 @@ namespace ExpenseTracker.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -168,8 +167,6 @@ namespace ExpenseTracker.Data.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("OrganizationId");
-
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
@@ -194,9 +191,6 @@ namespace ExpenseTracker.Data.Migrations
                     b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -207,8 +201,6 @@ namespace ExpenseTracker.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IsDeleted");
-
-                    b.HasIndex("OrganizationId");
 
                     b.HasIndex("UserId");
 
@@ -293,39 +285,6 @@ namespace ExpenseTracker.Data.Migrations
                     b.HasIndex("ServiceId");
 
                     b.ToTable("ExpenseServices");
-                });
-
-            modelBuilder.Entity("ExpenseTracker.Data.Entities.Organization", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Owner")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IsDeleted");
-
-                    b.ToTable("Organizations");
                 });
 
             modelBuilder.Entity("ExpenseTracker.Data.Entities.Product", b =>
@@ -569,30 +528,11 @@ namespace ExpenseTracker.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Data.Entities.ApplicationUser", b =>
-                {
-                    b.HasOne("ExpenseTracker.Data.Entities.Organization", "Organization")
-                        .WithMany("Users")
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Organization");
-                });
-
             modelBuilder.Entity("ExpenseTracker.Data.Entities.Expense", b =>
                 {
-                    b.HasOne("ExpenseTracker.Data.Entities.Organization", "Organization")
-                        .WithMany("Expenses")
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("ExpenseTracker.Data.Entities.ApplicationUser", "User")
                         .WithMany("Expenses")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("Organization");
 
                     b.Navigation("User");
                 });
@@ -729,13 +669,6 @@ namespace ExpenseTracker.Data.Migrations
                     b.Navigation("ExpenseProducts");
 
                     b.Navigation("ExpenseService");
-                });
-
-            modelBuilder.Entity("ExpenseTracker.Data.Entities.Organization", b =>
-                {
-                    b.Navigation("Expenses");
-
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("ExpenseTracker.Data.Entities.Product", b =>
