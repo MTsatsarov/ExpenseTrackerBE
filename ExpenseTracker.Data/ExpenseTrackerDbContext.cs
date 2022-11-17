@@ -25,6 +25,11 @@ namespace ExpenseTracker.Data
 
 		public DbSet<ExpenseProducts> ExpenseProducts { get; set; }
 
+		public DbSet<Service> Services { get; set; }
+
+		public DbSet<ExpenseServices> ExpenseServices { get; set; }
+
+		public DbSet<Organization> Organizations { get; set; }
 		public override int SaveChanges() => this.SaveChanges(true);
 
 		public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -50,6 +55,11 @@ namespace ExpenseTracker.Data
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
+			builder.Entity<Expense>()
+				.HasOne(a => a.ExpenseService)
+				.WithOne(b => b.Expense)
+				.HasForeignKey<ExpenseServices>(b => b.ExpenseId);
+
 			// Needed for Identity models configuration
 			base.OnModelCreating(builder);
 

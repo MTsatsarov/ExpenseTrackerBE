@@ -1,4 +1,5 @@
 ﻿using ExpenseTracker.Data.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace ExpenseTracker.Data.Entities
 {
@@ -17,6 +18,17 @@ namespace ExpenseTracker.Data.Entities
 
 		public string UserId { get; set; }
 
+		[Required]
+		public string Type { get; set; }
+
 		public virtual ApplicationUser User { get; set; }
+
+		public Guid? ExpenseServiceId { get; set; }
+
+		public virtual ExpenseServices ExpenseService{ get; set; }
+
+		public Guid OrganizationId { get; set; }
+
+		public virtual Organization Organization { get; set; }
 	}
 }

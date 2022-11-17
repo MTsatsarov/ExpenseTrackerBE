@@ -41,6 +41,11 @@ namespace ExpenseTracker.Services
 				UserName = model.UserName,
 				FirstName = model.FirstName,
 				LastName = model.LastName,
+				Organization = new Organization()
+				{
+					Name = model.Organization,
+				}
+
 			};
 
 			var result = await this.userManager.CreateAsync(user, model.Password);
@@ -49,12 +54,18 @@ namespace ExpenseTracker.Services
 				throw new BadRequestException("User creation failed!");
 			}
 
-			var isSucceeded = await userManager.AddToRoleAsync(user, RoleConstants.Client);
 
-			if (!isSucceeded.Succeeded)
+			var isSucceeded = await userManager.AddToRoleAsync(user, RoleConstants.Client);
+			var isOwner = await userManager.AddToRoleAsync(user, RoleConstants.Owner);
+
+			if (!isSucceeded.Succeeded || !isOwner.Succeeded)
 			{
 				throw new BadRequestException("User creation failed!");
 			}
+
+			user.Organization.Owner = user.Id;
+			await this.db.SaveChangesAsync();
+
 			return "User created succesfully";
 		}
 
