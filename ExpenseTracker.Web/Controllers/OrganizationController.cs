@@ -30,5 +30,16 @@ namespace ExpenseTracker.Web.Controllers
 			return this.Ok();
 		}
 
+		[HttpGet]
+		[Route("getEmployees")]
+		[Authorize(Roles = "CLIENT")]
+		public async Task<IActionResult> GetEmployees()
+		{
+			var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			var organization = await this.organizationService.GetUserOrganization(userId);
+			var result = await this.organizationService.GetAllUsers(organization);
+
+			return this.Ok(result);
+		}
 	}
 }
