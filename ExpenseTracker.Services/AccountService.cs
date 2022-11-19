@@ -188,7 +188,8 @@ namespace ExpenseTracker.Services
 			{
 				throw new BadRequestException("Unable to create employee.");
 			}
-			var isOwner = await userManager.AddToRoleAsync(user, RoleConstants.Employee);
+			 await userManager.AddToRoleAsync(user, RoleConstants.Employee);
+			 await userManager.AddToRoleAsync(user, RoleConstants.Client);
 
 		}
 	}
