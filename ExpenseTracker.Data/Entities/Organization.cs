@@ -18,6 +18,15 @@ namespace ExpenseTracker.Data.Entities
 
 		public string Owner { get; set; }
 
+		[Required]
+		public string Currency { get; set; }
+
+		[Required]
+		public string CurrencySymbol { get; set; }
+
+		[Required]
+		public string Abbreviation { get; set; }
+
 		public virtual ICollection<Expense> Expenses { get; set; }
 
 		[Required]
