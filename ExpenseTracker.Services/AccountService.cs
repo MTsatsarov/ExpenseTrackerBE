@@ -44,6 +44,9 @@ namespace ExpenseTracker.Services
 				Organization = new Organization()
 				{
 					Name = model.Organization,
+					Currency = model.Currency.Currency,
+					Abbreviation = model.Currency.Abbreviation,
+					CurrencySymbol = model.Currency.Symbol
 				}
 
 			};

@@ -11,5 +11,7 @@ namespace ExpenseTracker.Services.Interfaces
 		 Task AddEmployee(RegisterEmployeeModel model, Organization organization);
 
 		Task<IEnumerable<OrganizationUserList>> GetAllUsers(Organization organization);
+
+		IEnumerable<CurrenciesList> GetAllCurrencies();
 	}
 }

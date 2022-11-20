@@ -4,6 +4,8 @@ using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Services.Models.Organization;
 using ExpenseTracker.Services.Models.User;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System;
 
 namespace ExpenseTracker.Services
 {
@@ -23,6 +25,19 @@ namespace ExpenseTracker.Services
 			await this.accountService.AddUser(model, organization);
 		}
 
+		public IEnumerable<CurrenciesList> GetAllCurrencies()
+		{
+			var currencies = new List<CurrenciesList>();
+			var solutiondir = Path.Combine(Environment.CurrentDirectory, "../ExpenseTracker.Services/StaticFiles/Currencies.json");
+			using (StreamReader r = new StreamReader(solutiondir))
+			{
+				string json = r.ReadToEnd();
+				currencies = JsonSerializer.Deserialize<List<CurrenciesList>>(json);
+			}
+
+			return currencies;
+		}
+
 		public async Task<IEnumerable<OrganizationUserList>> GetAllUsers(Organization organization)
 		{
 			var list = new List<OrganizationUserList>();
@@ -30,23 +45,23 @@ namespace ExpenseTracker.Services
 
 			foreach (var user in users)
 			{
-				var a = new OrganizationUserList();
-				a.Id = user.Id;
-				a.Email = user.Email;
-				a.CreatedOn = user.CreatedOn.ToString("MM/dd/yyyy h:mmtt");
+				var employee = new OrganizationUserList();
+				employee.Id = user.Id;
+				employee.Email = user.Email;
+				employee.CreatedOn = user.CreatedOn.ToString("MM/dd/yyyy h:mmtt");
 
-				var s = user.Expenses.OrderByDescending(x => x.ExpenseProducts.OrderByDescending(x => x.Price * x.Quantity)).FirstOrDefault();
+				var userExpense = user.Expenses.OrderByDescending(x => x.ExpenseProducts.OrderByDescending(x => x.Price * x.Quantity)).FirstOrDefault();
 
-				if (s is not null)
+				if (userExpense is not null)
 				{
-					a.HighestSum = s.ExpenseProducts.FirstOrDefault().Price;
-					a.LastTransaction = user.Expenses.OrderByDescending(x => x.CreatedOn).FirstOrDefault().CreatedOn.ToString("MM/dd/yyyy h:mm tt");
+					employee.HighestSum = userExpense.ExpenseProducts.FirstOrDefault().Price;
+					employee.LastTransaction = user.Expenses.OrderByDescending(x => x.CreatedOn).FirstOrDefault().CreatedOn.ToString("MM/dd/yyyy h:mm tt");
 
 				}
-				a.TotalSum = user.Expenses.Sum(x => x.ExpenseProducts.Sum(x => x.Price * x.Quantity));
-				a.TotalTransactions = user.Expenses.ToList().Count();
-				a.UserName = user.UserName;
-				list.Add(a);
+				employee.TotalSum = user.Expenses.Sum(x => x.ExpenseProducts.Sum(x => x.Price * x.Quantity));
+				employee.TotalTransactions = user.Expenses.ToList().Count();
+				employee.UserName = user.UserName;
+				list.Add(employee);
 			}
 
 			return list;

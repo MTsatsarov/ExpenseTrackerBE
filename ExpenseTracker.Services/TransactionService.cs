@@ -48,22 +48,25 @@ namespace ExpenseTracker.Services
 				{
 					var currentProduct = new Product();
 
-					//TODO REMOVE MULTIPLE ADDING OF SAME PRODUCT
-					if (product.ProductId != null)
+					if (product.ProductId is not null)
 					{
 						currentProduct = await this.db.Products.FirstOrDefaultAsync(x => x.Id == product.ProductId.Value);
-						if (currentProduct == null)
+						if (currentProduct is null)
 						{
 							throw new BadRequestException("Invalid product");
 						}
 					}
 					else
 					{
-
-						currentProduct.Name = product.Name;
-						currentProduct.Stores.Add(store);
-						await this.db.Products.AddAsync(currentProduct);
-						await this.db.SaveChangesAsync();
+						currentProduct = await this.db.Products.FirstOrDefaultAsync(x => x.Name == product.Name);
+						if (currentProduct is null)
+						{
+							currentProduct = new Product();
+							currentProduct.Name = product.Name;
+							currentProduct.Stores.Add(store);
+							await this.db.Products.AddAsync(currentProduct);
+							await this.db.SaveChangesAsync();
+						}
 					}
 
 					var expenseProduct = new ExpenseProducts()
@@ -124,8 +127,8 @@ namespace ExpenseTracker.Services
 				throw new BadRequestException("Something went wrong.");
 			}
 
-			var yearlyTransactions = await this.db.Expenses.Where(x => x.CreatedOn.Year == currentYear && 
-			x.Organization == organization ).ToListAsync();
+			var yearlyTransactions = await this.db.Expenses.Where(x => x.CreatedOn.Year == currentYear &&
+			x.Organization == organization).ToListAsync();
 
 			foreach (var transaction in yearlyTransactions)
 			{

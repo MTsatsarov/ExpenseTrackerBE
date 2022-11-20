@@ -9,13 +9,23 @@ namespace ExpenseTracker.Web.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
-	public class OrganizationController:ControllerBase
+	public class OrganizationController : ControllerBase
 	{
 		private readonly IOrganizationService organizationService;
 
 		public OrganizationController(IOrganizationService organizationService)
 		{
 			this.organizationService = organizationService;
+		}
+
+		[HttpGet]
+		[AllowAnonymous]
+		[Route("currencies")]
+		public IActionResult GetAllCurrencies()
+		{
+			var result =  this.organizationService.GetAllCurrencies();
+
+			return this.Ok(result);
 		}
 
 		[HttpPost]
