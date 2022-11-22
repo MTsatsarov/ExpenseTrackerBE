@@ -37,6 +37,7 @@ namespace ExpenseTracker.Web.Controllers
 			{
 				return this.BadRequest();
 			}
+
 			return this.Ok(result);
 		}
 

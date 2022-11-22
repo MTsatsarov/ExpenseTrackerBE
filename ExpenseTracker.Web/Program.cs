@@ -88,6 +88,7 @@ builder.Services.AddTransient<IProductService, ProductService>();
 builder.Services.AddTransient<IStoreService, StoreService>();
 builder.Services.AddTransient<ITransactionService, TransactionService>();
 builder.Services.AddTransient<IOrganizationService, OrganizationService>();
+builder.Services.AddTransient<IStorageService, StorageService>();
 
 builder.Services.AddTransient<ExceptionHandlerMIddleware, ExceptionHandlerMIddleware>();
 builder.Services.AddControllers();

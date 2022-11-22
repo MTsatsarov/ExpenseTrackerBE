@@ -10,6 +10,7 @@ namespace ExpenseTracker.Data.Entities
 			this.Id = Guid.NewGuid();
 			this.Users = new HashSet<ApplicationUser>();
 			this.Expenses = new HashSet<Expense>();
+			this.Storages = new HashSet<Storage>();
 		}
 
 		[Required]
@@ -27,9 +28,14 @@ namespace ExpenseTracker.Data.Entities
 		[Required]
 		public string Abbreviation { get; set; }
 
+
 		public virtual ICollection<Expense> Expenses { get; set; }
 
 		[Required]
 		public virtual ICollection<ApplicationUser> Users { get; set; }
+
+
+		public virtual ICollection<Storage> Storages { get; set; }
+
 	}
 }

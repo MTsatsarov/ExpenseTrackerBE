@@ -50,13 +50,12 @@ namespace ExpenseTracker.Services
 				employee.Email = user.Email;
 				employee.CreatedOn = user.CreatedOn.ToString("MM/dd/yyyy h:mmtt");
 
-				var userExpense = user.Expenses.OrderByDescending(x => x.ExpenseProducts.OrderByDescending(x => x.Price * x.Quantity)).FirstOrDefault();
+				var userExpense = user.Expenses.OrderByDescending(x => x.ExpenseProducts.Sum(x => x.Price * x.Quantity)).FirstOrDefault();
 
 				if (userExpense is not null)
 				{
 					employee.HighestSum = userExpense.ExpenseProducts.FirstOrDefault().Price;
 					employee.LastTransaction = user.Expenses.OrderByDescending(x => x.CreatedOn).FirstOrDefault().CreatedOn.ToString("MM/dd/yyyy h:mm tt");
-
 				}
 				employee.TotalSum = user.Expenses.Sum(x => x.ExpenseProducts.Sum(x => x.Price * x.Quantity));
 				employee.TotalTransactions = user.Expenses.ToList().Count();
