@@ -1,4 +1,5 @@
 ﻿using ExpenseTracker.Services.Interfaces;
+using ExpenseTracker.Services.Models.Storage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -26,5 +27,28 @@ namespace ExpenseTracker.Web
 
 			return this.Ok(products);
 		}
+
+		[HttpPost]
+		[Authorize]
+		[Route("add")]
+		public async Task<IActionResult> AddStorage(StorageInputModel model)
+		{
+			model.UserId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			await this.storageService.Add(model);
+
+			return this.Ok();
+		}
+
+		[HttpPatch]
+		[Authorize]
+		[Route("update")]
+		public async Task<IActionResult> Update(StorePatchModel model)
+		{
+			model.UserId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			await this.storageService.Update(model);
+
+			return this.Ok();
+		}
+		
 	}
 }

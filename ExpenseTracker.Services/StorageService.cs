@@ -2,6 +2,7 @@
 using ExpenseTracker.Data.Entities;
 using ExpenseTracker.Services.Interfaces;
 using ExpenseTracker.Services.Models.Products;
+using ExpenseTracker.Services.Models.Storage;
 using ExpenseTracker.Services.Utils.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,16 +14,29 @@ namespace ExpenseTracker.Services
 		private readonly ExpenseTrackerDbContext db;
 		private readonly IOrganizationService organizationService;
 
-		public StorageService( ExpenseTrackerDbContext db,IOrganizationService organizationService,
+		public StorageService(ExpenseTrackerDbContext db, IOrganizationService organizationService,
 			IProductService productService)
 		{
 			this.productService = productService;
 			this.db = db;
 			this.organizationService = organizationService;
 		}
-		public Task AddProduct(Product product)
+
+		public async Task Add(StorageInputModel model)
 		{
-			throw new NotImplementedException();
+			var organization = await this.organizationService.GetUserOrganization(model.UserId);
+			var storage = new Storage()
+			{
+				Product = model.Product,
+				OrganizationId = organization.Id,
+				Quantity = model.Quantity,
+				UpdatedBy = model.Email,
+
+			};
+
+			await this.db.Storages.AddAsync(storage);
+			await this.db.SaveChangesAsync();
+
 		}
 
 		public async Task<IEnumerable<CompanyProducts>> GetStorage(string userId)
@@ -30,8 +44,10 @@ namespace ExpenseTracker.Services
 			var organization = await this.organizationService.GetUserOrganization(userId);
 			var products = new List<CompanyProducts>();
 
-			var storages = 
-				await this.db.Storages.Where(x=>x.OrganizationId == organization.Id).ToListAsync();
+			var storages =
+				await this.db.Storages.Where(x => x.OrganizationId == organization.Id)
+				.OrderByDescending(x=>x.ModifiedOn)
+				.ToListAsync();
 
 			foreach (var storage in storages)
 			{
@@ -50,6 +66,23 @@ namespace ExpenseTracker.Services
 			}
 
 			return products;
+		}
+
+		public async Task Update(StorePatchModel model)
+		{
+			var organization = await this.organizationService.GetUserOrganization(model.UserId);
+			var storage = organization.Storages.FirstOrDefault(x => x.Id == model.StorageId);
+
+			if (storage is null)
+			{
+				throw new BadRequestException("Invalid storage.");
+			}
+
+			storage.Product = model.Product;
+			storage.Quantity = model.Quantity;
+
+			await this.db.SaveChangesAsync();
+
 		}
 	}
 }
