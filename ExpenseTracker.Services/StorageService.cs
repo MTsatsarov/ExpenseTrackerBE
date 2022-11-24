@@ -46,7 +46,7 @@ namespace ExpenseTracker.Services
 
 			var storages =
 				await this.db.Storages.Where(x => x.OrganizationId == organization.Id)
-				.OrderByDescending(x=>x.ModifiedOn)
+				.OrderByDescending(x=>x.CreatedOn)
 				.ToListAsync();
 
 			foreach (var storage in storages)

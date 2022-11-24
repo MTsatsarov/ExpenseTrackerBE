@@ -15,7 +15,7 @@ namespace ExpenseTracker.Services.Models.User
 		}
 		public string UserId { get; set; }
 		
-		public string Role { get; set; }
+		public IEnumerable<string> Roles { get; set; }
 
 		public string Email { get; set; }
 

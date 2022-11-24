@@ -132,12 +132,21 @@ namespace ExpenseTracker.Services
 			{
 				throw new BadRequestException("User not found");
 			}
-			// TODO: REFACTOR
-			var role = await this.db.UserRoles.FirstOrDefaultAsync(x => x.UserId == user.Id);
-			var roleName = await this.db.Roles.FirstOrDefaultAsync(x => x.Id == role.RoleId);
+
+			var userRoles = await this.db.UserRoles.Where(x => x.UserId == user.Id).ToListAsync();
+			var roleNames = new List<string>();
+			foreach (var userRole in userRoles)
+			{
+				var currRole =  await this.db.Roles.FirstOrDefaultAsync(x => x.Id == userRole.RoleId);
+
+				if (currRole is not null)
+				{
+					roleNames.Add(currRole.Name);
+				}
+			}
 
 			var response = new UserResponse(user);
-			response.Role = roleName.Name;
+			response.Roles = roleNames.ToList();
 
 			return response;
 
