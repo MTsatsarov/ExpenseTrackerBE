@@ -1,6 +1,4 @@
-﻿using ExpenseTracker.Data.Entities;
-using ExpenseTracker.Services.Models.Products;
-using ExpenseTracker.Services.Models.Storage;
+﻿using ExpenseTracker.Services.Models.Storage;
 
 namespace ExpenseTracker.Services.Interfaces
 {
@@ -8,7 +6,7 @@ namespace ExpenseTracker.Services.Interfaces
 	{
 		Task Add(StorageInputModel model);
 
-		Task<IEnumerable<CompanyProducts>> GetStorage(string userId);
+		Task<StorageResponse> GetStorage(int page,int itemsPerPage, string userId);
 
 		Task Update(StorePatchModel model);
 	}

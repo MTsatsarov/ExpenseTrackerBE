@@ -39,17 +39,21 @@ namespace ExpenseTracker.Services
 
 		}
 
-		public async Task<IEnumerable<CompanyProducts>> GetStorage(string userId)
+		public async Task<StorageResponse> GetStorage(int page, int itemsPerPage ,string userId)
 		{
 			var organization = await this.organizationService.GetUserOrganization(userId);
+			var response = new StorageResponse();
 			var products = new List<CompanyProducts>();
 
 			var storages =
 				await this.db.Storages.Where(x => x.OrganizationId == organization.Id)
 				.OrderByDescending(x=>x.CreatedOn)
 				.ToListAsync();
+			response.Count = storages.Count;
 
-			foreach (var storage in storages)
+			var filteredStorages = storages.Skip(itemsPerPage * (page - 1)).Take(itemsPerPage).ToList();
+
+			foreach (var storage in filteredStorages)
 			{
 				string lastUpdate = storage.ModifiedOn != null ?
 					storage.ModifiedOn.Value.ToString("dddd, dd MMMM yyyy") :
@@ -64,8 +68,8 @@ namespace ExpenseTracker.Services
 					LastUpdate = lastUpdate
 				});
 			}
-
-			return products;
+			response.Products = products;
+			return response;
 		}
 
 		public async Task Update(StorePatchModel model)
