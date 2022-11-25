@@ -43,11 +43,11 @@ namespace ExpenseTracker.Web.Controllers
 		[HttpGet]
 		[Route("getEmployees")]
 		[Authorize(Roles = "CLIENT")]
-		public async Task<IActionResult> GetEmployees()
+		public async Task<IActionResult> GetEmployees(int page =1, int itemsPerPage = 10)
 		{
 			var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 			var organization = await this.organizationService.GetUserOrganization(userId);
-			var result = await this.organizationService.GetAllUsers(organization);
+			var result = await this.organizationService.GetAllUsers(organization, page, itemsPerPage);
 
 			return this.Ok(result);
 		}

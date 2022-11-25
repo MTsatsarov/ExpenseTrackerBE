@@ -38,12 +38,17 @@ namespace ExpenseTracker.Services
 			return currencies;
 		}
 
-		public async Task<IEnumerable<OrganizationUserList>> GetAllUsers(Organization organization)
+		public async Task<OrganizationUserResponse> GetAllUsers
+			(Organization organization,int page,int itemsPerPage )
 		{
+			var organizationResponse = new OrganizationUserResponse();
 			var list = new List<OrganizationUserList>();
-			var users = await this.db.Users.Where(x => x.OrganizationId == organization.Id).ToListAsync();
 
-			foreach (var user in users)
+			var users = await this.db.Users.Where(x => x.OrganizationId == organization.Id).ToListAsync();
+			organizationResponse.Count = users.Count;
+			var filteredUsers = users.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+
+			foreach (var user in filteredUsers)
 			{
 				var employee = new OrganizationUserList();
 				employee.Id = user.Id;
@@ -63,7 +68,8 @@ namespace ExpenseTracker.Services
 				list.Add(employee);
 			}
 
-			return list;
+			organizationResponse.Employees = list.ToList();
+			return organizationResponse;
 		}
 
 		public async Task<Organization> GetUserOrganization(string userId)

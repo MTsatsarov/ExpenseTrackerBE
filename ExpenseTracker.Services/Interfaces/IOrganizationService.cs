@@ -10,7 +10,7 @@ namespace ExpenseTracker.Services.Interfaces
 
 		 Task AddEmployee(RegisterEmployeeModel model, Organization organization);
 
-		Task<IEnumerable<OrganizationUserList>> GetAllUsers(Organization organization);
+		Task<OrganizationUserResponse> GetAllUsers(Organization organization,int page,int itemsPerPage);
 
 		IEnumerable<CurrenciesList> GetAllCurrencies();
 	}
