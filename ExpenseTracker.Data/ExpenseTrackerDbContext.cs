@@ -30,6 +30,9 @@ namespace ExpenseTracker.Data
 		public DbSet<ExpenseServices> ExpenseServices { get; set; }
 
 		public DbSet<Organization> Organizations { get; set; }
+
+		public DbSet<Storage> Storages { get; set; }
+
 		public override int SaveChanges() => this.SaveChanges(true);
 
 		public override int SaveChanges(bool acceptAllChangesOnSuccess)

@@ -9,13 +9,23 @@ namespace ExpenseTracker.Web.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
-	public class OrganizationController:ControllerBase
+	public class OrganizationController : ControllerBase
 	{
 		private readonly IOrganizationService organizationService;
 
 		public OrganizationController(IOrganizationService organizationService)
 		{
 			this.organizationService = organizationService;
+		}
+
+		[HttpGet]
+		[AllowAnonymous]
+		[Route("currencies")]
+		public IActionResult GetAllCurrencies()
+		{
+			var result =  this.organizationService.GetAllCurrencies();
+
+			return this.Ok(result);
 		}
 
 		[HttpPost]
@@ -33,11 +43,11 @@ namespace ExpenseTracker.Web.Controllers
 		[HttpGet]
 		[Route("getEmployees")]
 		[Authorize(Roles = "CLIENT")]
-		public async Task<IActionResult> GetEmployees()
+		public async Task<IActionResult> GetEmployees(int page =1, int itemsPerPage = 10)
 		{
 			var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 			var organization = await this.organizationService.GetUserOrganization(userId);
-			var result = await this.organizationService.GetAllUsers(organization);
+			var result = await this.organizationService.GetAllUsers(organization, page, itemsPerPage);
 
 			return this.Ok(result);
 		}

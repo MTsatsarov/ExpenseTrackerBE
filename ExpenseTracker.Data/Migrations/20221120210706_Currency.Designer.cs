@@ -4,6 +4,7 @@ using ExpenseTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpenseTracker.Data.Migrations
 {
     [DbContext(typeof(ExpenseTrackerDbContext))]
-    partial class ExpenseTrackerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221120210706_Currency")]
+    partial class Currency
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -398,47 +400,6 @@ namespace ExpenseTracker.Data.Migrations
                     b.ToTable("Services");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Data.Entities.Storage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Product")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IsDeleted");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.ToTable("Storages");
-                });
-
             modelBuilder.Entity("ExpenseTracker.Data.Entities.Store", b =>
                 {
                     b.Property<Guid>("Id")
@@ -688,17 +649,6 @@ namespace ExpenseTracker.Data.Migrations
                     b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Data.Entities.Storage", b =>
-                {
-                    b.HasOne("ExpenseTracker.Data.Entities.Organization", "Organization")
-                        .WithMany("Storages")
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Organization");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("ExpenseTracker.Data.Entities.ApplicationRole", null)
@@ -798,8 +748,6 @@ namespace ExpenseTracker.Data.Migrations
             modelBuilder.Entity("ExpenseTracker.Data.Entities.Organization", b =>
                 {
                     b.Navigation("Expenses");
-
-                    b.Navigation("Storages");
 
                     b.Navigation("Users");
                 });
