@@ -8,6 +8,8 @@
 
 		public string Store { get; set; }
 
-		public DateTime CreatedOn { get; set; }
+		public string CreatedOn { get; set; }
+
+		public string User { get; set; }
 	}
 }

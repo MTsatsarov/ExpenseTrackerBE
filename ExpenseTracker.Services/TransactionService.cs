@@ -278,9 +278,10 @@ namespace ExpenseTracker.Services
 				{
 					var a = (new TransactionResponse()
 					{
-						CreatedOn = transaction.CreatedOn,
+						CreatedOn = transaction.CreatedOn.ToString("dddd, dd MMMM yyyy HH:mm:ss"),
 						Id = transaction.Id,
 						Store = transaction.Stores.FirstOrDefault().Name,
+						User = transaction.User.Email,
 					});
 
 					if (transaction.Type == ExpenseTypeConstants.Product)
