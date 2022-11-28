@@ -50,7 +50,7 @@ namespace ExpenseTracker.Web.Controllers
 		[HttpGet]
 		[Route("getTransactions")]
 		[Authorize(Roles = "CLIENT")]
-		public async Task<IActionResult> GetTransactions()
+		public async Task<IActionResult> GetTransactions(int page=1, int itemsPerPage=10)
 		{
 			var userId = this.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -58,7 +58,7 @@ namespace ExpenseTracker.Web.Controllers
 			{
 				return this.BadRequest("User id missing.");
 			}
-			var result = await this.transactionService.GetTransactions(userId);
+			var result = await this.transactionService.GetTransactions(userId,page,itemsPerPage);
 			return this.Ok(result);
 		}
 
@@ -68,7 +68,7 @@ namespace ExpenseTracker.Web.Controllers
 		public async Task<IActionResult> GetUserTransactions()
 		{
 			// WHY USERID is null ????
-			var result = await this.transactionService.GetTransactions(null);
+			var result = await this.transactionService.GetTransactions(null,0,0);
 			return this.Ok(result);
 		}
 

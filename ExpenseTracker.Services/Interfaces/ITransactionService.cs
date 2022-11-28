@@ -5,7 +5,7 @@ namespace ExpenseTracker.Services.Interfaces
 	public interface ITransactionService
 	{
 		Task<bool> Create(TransactionInputModel model);
-		Task<List<TransactionResponse>> GetTransactions(string userId);
+		Task<TransactionResponse> GetTransactions(string userId,int page,int itemsPerPage);
 		Task<TransactionDetails> GetDetails(Guid transactionId);
 
 		Task<DashboardTransactionsResponse> GetDashboardTransactions(string userId);
