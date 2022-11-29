@@ -2,6 +2,7 @@
 using ExpenseTracker.Data.Common;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ExpenseTracker.Data.Entities
 {
@@ -32,6 +33,11 @@ namespace ExpenseTracker.Data.Entities
 		public Guid OrganizationId { get; set; }
 
 		public virtual Organization Organization { get; set; }
+
+		[ForeignKey("Settings")]
+		public Guid SettingsId { get; set; }
+
+		public virtual Settings Settings{ get; set; }
 
 		public virtual ICollection<Expense> Expenses { get; set; }
 

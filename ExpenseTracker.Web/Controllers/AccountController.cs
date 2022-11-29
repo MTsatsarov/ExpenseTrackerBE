@@ -136,5 +136,21 @@ namespace ExpenseTracker.Web.Controllers
 
 			var result = await this.accountService.UpdateUser(model);		return this.Ok(result);
 		}
+
+		[HttpPost]
+		[Route("changeThemeMode")]
+		[Authorize]
+		public async Task<IActionResult> ChangeThemeMode([FromBody]string mode = "light")
+		{
+			if (mode.ToLower() !="light" && mode.ToLower() != "dark")
+			{
+				return this.BadRequest("Invalid mode");
+			}
+
+			var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+			await this.accountService.ChangeMode(mode, userId);
+
+			return this.Ok();
+		}
 	}
 }

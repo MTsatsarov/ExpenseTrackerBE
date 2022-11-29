@@ -12,6 +12,7 @@ namespace ExpenseTracker.Services.Models.User
 			FirstName = user.FirstName;
 			LastName = user.LastName;
 			CurrencySymbol = user.Organization.CurrencySymbol;
+			Mode = user.Settings.Mode;
 		}
 		public string UserId { get; set; }
 		
@@ -24,5 +25,7 @@ namespace ExpenseTracker.Services.Models.User
 		public string LastName { get; set; }
 
 		public string CurrencySymbol { get; set; }
+
+		public string Mode { get; set; }
 	}
 }

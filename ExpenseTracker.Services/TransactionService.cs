@@ -159,142 +159,162 @@ namespace ExpenseTracker.Services
 			return result > 0;
 		}
 
-			public async Task<DashboardTransactionsResponse> GetDashboardTransactions(string userId)
+		public async Task<DashboardTransactionsResponse> GetDashboardTransactions(string userId)
+		{
+			var currentMonth = DateTime.UtcNow.Month;
+			var currentYear = DateTime.UtcNow.Year;
+			var response = new DashboardTransactionsResponse();
+			var organization = await this.db.Organizations.FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == userId));
+
+			if (organization is null)
 			{
-				var currentMonth = DateTime.UtcNow.Month;
-				var currentYear = DateTime.UtcNow.Year;
-				var response = new DashboardTransactionsResponse();
-				var organization = await this.db.Organizations.FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == userId));
+				throw new BadRequestException("Something went wrong.");
+			}
 
-				if (organization is null)
+			var yearlyTransactions = await this.db.Expenses.Where(x => x.CreatedOn.Year == currentYear &&
+			x.Organization == organization).ToListAsync();
+
+			foreach (var transaction in yearlyTransactions)
+			{
+				var currenTransaction = response.LastYearTransactions.FirstOrDefault(x => x.Month == transaction.CreatedOn.ToString("MMMM", CultureInfo.InvariantCulture));
+				if (currenTransaction != null)
 				{
-					throw new BadRequestException("Something went wrong.");
-				}
-
-				var yearlyTransactions = await this.db.Expenses.Where(x => x.CreatedOn.Year == currentYear &&
-				x.Organization == organization).ToListAsync();
-
-				foreach (var transaction in yearlyTransactions)
-				{
-					var currenTransaction = response.LastYearTransactions.FirstOrDefault(x => x.Month == transaction.CreatedOn.ToString("MMMM", CultureInfo.InvariantCulture));
-					if (currenTransaction != null)
-					{
-						if (transaction.Type == ExpenseTypeConstants.Product)
-						{
-							currenTransaction.Sum += transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
-						}
-						else
-						{
-							currenTransaction.Sum += transaction.ExpenseService.Price;
-						}
-					}
-
-				}
-
-				var currentMonthTransactions = yearlyTransactions.Where(x => x.CreatedOn.Month == currentMonth).ToList();
-
-				for (int i = 1; i <= 31; i++)
-				{
-					response.CurrentMonthTransactions.Add(new TransactionsByDate()
-					{
-						Name = i.ToString(),
-					});
-				}
-
-				foreach (var transaction in currentMonthTransactions)
-				{
-					var currentTransaction = response.CurrentMonthTransactions.FirstOrDefault(x => int.Parse(x.Name) == transaction.CreatedOn.Day);
-
 					if (transaction.Type == ExpenseTypeConstants.Product)
 					{
-						currentTransaction.Sum = transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
+						currenTransaction.Sum += transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
 					}
 					else
 					{
-						currentTransaction.Sum = transaction.ExpenseService.Price;
+						currenTransaction.Sum += transaction.ExpenseService.Price;
 					}
-
 				}
 
-				var storeTransactions = new Dictionary<string, int>();
-
-				foreach (var expense in yearlyTransactions)
-				{
-					var currStore = expense.Stores.FirstOrDefault().Name;
-
-					if (!storeTransactions.ContainsKey(currStore))
-					{
-						storeTransactions.Add(currStore, 0);
-					}
-					storeTransactions[currStore] += 1;
-				}
-				var transactions = storeTransactions.OrderByDescending(x => x.Value).Take(5).ToDictionary(x => x.Key, x => x.Value);
-
-				foreach (var transaction in transactions)
-				{
-					response.TransactionsByStore.Add(new TransactionByStore()
-					{
-						Name = transaction.Key,
-						Count = transaction.Value,
-					});
-				}
-
-				return response;
 			}
 
-			public async Task<TransactionDetails> GetDetails(Guid id)
+			var currentMonthTransactions = yearlyTransactions.Where(x => x.CreatedOn.Month == currentMonth).ToList();
+
+			for (int i = 1; i <= 31; i++)
 			{
-				var transaction = await this.db.Expenses.Where(x => x.Id == id).FirstOrDefaultAsync();
-
-				if (transaction == null)
+				response.CurrentMonthTransactions.Add(new TransactionsByDate()
 				{
-					throw new BadRequestException("Transaction not found.");
-				}
-				var transactionModel = new TransactionDetails();
-				transactionModel.Id = id;
-				transactionModel.Store = transaction.Stores.FirstOrDefault().Name;
-
-				foreach (var product in transaction.ExpenseProducts)
-				{
-					transactionModel.Products.Add(new ProductTransactionModel()
-					{
-						Name = product.Product.Name,
-						Price = product.Price,
-						ProductId = product.ProductId,
-						Quantity = product.Quantity
-					});
-				}
-
-				return transactionModel;
+					Name = i.ToString(),
+				});
 			}
 
-			public async Task<List<TransactionResponse>> GetTransactions(string userId)
+			foreach (var transaction in currentMonthTransactions)
 			{
-				var organization = await this.db.Organizations.FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == userId));
-				var transactions = await this.db.Expenses.Where(x => x.Organization == organization).ToListAsync();
-				var result = new List<TransactionResponse>();
+				var currentTransaction = response.CurrentMonthTransactions.FirstOrDefault(x => int.Parse(x.Name) == transaction.CreatedOn.Day);
 
-				foreach (var transaction in transactions)
+				if (transaction.Type == ExpenseTypeConstants.Product)
 				{
-					var a = (new TransactionResponse()
-					{
-						CreatedOn = transaction.CreatedOn,
-						Id = transaction.Id,
-						Store = transaction.Stores.FirstOrDefault().Name,
-					});
-
-					if (transaction.Type == ExpenseTypeConstants.Product)
-					{
-						a.TotalPrice = transaction.ExpenseProducts.Sum(x => x.Price * x.Quantity);
-					}
-					else
-					{
-						a.TotalPrice = transaction.ExpenseService.Price;
-					}
-					result.Add(a);
+					currentTransaction.Sum = transaction.ExpenseProducts.Sum(ep => (ep.Quantity * ep.Price));
+				}
+				else
+				{
+					currentTransaction.Sum = transaction.ExpenseService.Price;
 				}
 
-				return result;
 			}
+
+			var storeTransactions = new Dictionary<string, int>();
+
+			foreach (var expense in yearlyTransactions)
+			{
+				var currStore = expense.Stores.FirstOrDefault().Name;
+
+				if (!storeTransactions.ContainsKey(currStore))
+				{
+					storeTransactions.Add(currStore, 0);
+				}
+				storeTransactions[currStore] += 1;
+			}
+			var transactions = storeTransactions.OrderByDescending(x => x.Value).Take(5).ToDictionary(x => x.Key, x => x.Value);
+
+			foreach (var transaction in transactions)
+			{
+				response.TransactionsByStore.Add(new TransactionByStore()
+				{
+					Name = transaction.Key,
+					Count = transaction.Value,
+				});
+			}
+
+			return response;
+		}
+
+		public async Task<TransactionDetails> GetDetails(Guid id)
+		{
+			var transaction = await this.db.Expenses.Where(x => x.Id == id).FirstOrDefaultAsync();
+
+			if (transaction == null)
+			{
+				throw new BadRequestException("Transaction not found.");
+			}
+			var transactionModel = new TransactionDetails();
+			transactionModel.Id = id;
+			transactionModel.Store = transaction.Stores.FirstOrDefault().Name;
+
+			foreach (var product in transaction.ExpenseProducts)
+			{
+				transactionModel.Products.Add(new ProductTransactionModel()
+				{
+					Name = product.Product.Name,
+					Price = product.Price,
+					ProductId = product.ProductId,
+					Quantity = product.Quantity
+				});
+			}
+
+			return transactionModel;
+		}
+
+		public async Task<TransactionResponse> GetTransactions(GetTransactionModel model)
+		{
+			var organization = await this.db.Organizations
+				.FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == model.UserId));
+
+			var transactions = await this.db.Expenses
+				.Where(x => x.Organization == organization).ToListAsync();
+				
+			if(model.Day is not null)
+			{
+				transactions =
+					transactions.Where(x => x.CreatedOn.Month == DateTime.UtcNow.Month && x.CreatedOn.Day == model.Day).ToList();
+			}
+
+
+			var filteredTransactions = transactions
+				.Skip(model.ItemsPerPage * (model.Page - 1))
+				.Take(model.ItemsPerPage)
+				.ToList();
+
+			var result = new TransactionResponse();
+			var responseTransactions = new List<HistoryTransactions>();
+
+			foreach (var transaction in filteredTransactions)
+			{
+				var currTransaction = (new HistoryTransactions()
+				{
+					CreatedOn = transaction.CreatedOn.ToString("dddd, dd MMMM yyyy HH:mm:ss",CultureInfo.InvariantCulture),
+					Id = transaction.Id,
+					Store = transaction.Stores.FirstOrDefault().Name,
+					User = transaction.User.Email,
+				});
+
+				if (transaction.Type == ExpenseTypeConstants.Product)
+				{
+					currTransaction.TotalPrice = transaction.ExpenseProducts.Sum(x => x.Price * x.Quantity);
+				}
+				else
+				{
+					currTransaction.TotalPrice = transaction.ExpenseService.Price;
+				}
+				responseTransactions.Add(currTransaction);
+			}
+			result.Transactions = responseTransactions;
+			result.Count = transactions.Count();
+
+			return result;
 		}
 	}
+}
