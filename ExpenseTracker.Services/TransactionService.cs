@@ -268,18 +268,24 @@ namespace ExpenseTracker.Services
 			return transactionModel;
 		}
 
-		public async Task<TransactionResponse> GetTransactions(string userId, int page, int itemsPerPage)
+		public async Task<TransactionResponse> GetTransactions(GetTransactionModel model)
 		{
 			var organization = await this.db.Organizations
-				.FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == userId));
+				.FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == model.UserId));
 
 			var transactions = await this.db.Expenses
 				.Where(x => x.Organization == organization).ToListAsync();
 				
+			if(model.Day is not null)
+			{
+				transactions =
+					transactions.Where(x => x.CreatedOn.Month == DateTime.UtcNow.Month && x.CreatedOn.Day == model.Day).ToList();
+			}
+
 
 			var filteredTransactions = transactions
-				.Skip(itemsPerPage * (page - 1))
-				.Take(itemsPerPage)
+				.Skip(model.ItemsPerPage * (model.Page - 1))
+				.Take(model.ItemsPerPage)
 				.ToList();
 
 			var result = new TransactionResponse();
@@ -289,7 +295,7 @@ namespace ExpenseTracker.Services
 			{
 				var currTransaction = (new HistoryTransactions()
 				{
-					CreatedOn = transaction.CreatedOn.ToString("dddd, dd MMMM yyyy HH:mm:ss"),
+					CreatedOn = transaction.CreatedOn.ToString("dddd, dd MMMM yyyy HH:mm:ss",CultureInfo.InvariantCulture),
 					Id = transaction.Id,
 					Store = transaction.Stores.FirstOrDefault().Name,
 					User = transaction.User.Email,

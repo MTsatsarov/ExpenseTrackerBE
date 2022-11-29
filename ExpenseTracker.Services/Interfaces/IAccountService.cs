@@ -21,5 +21,7 @@ namespace ExpenseTracker.Services.Interfaces
 		Task<UserResponse> GetCurrentUser(string id);
 
 		Task<string> UpdateUser(UserUpdateModel model);
+
+		Task ChangeMode(string mode,string userId);
 	}
 }

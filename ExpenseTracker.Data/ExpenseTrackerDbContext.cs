@@ -33,6 +33,8 @@ namespace ExpenseTracker.Data
 
 		public DbSet<Storage> Storages { get; set; }
 
+		public DbSet<Settings> Settings { get; set; }
+
 		public override int SaveChanges() => this.SaveChanges(true);
 
 		public override int SaveChanges(bool acceptAllChangesOnSuccess)

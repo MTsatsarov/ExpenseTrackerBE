@@ -47,7 +47,12 @@ namespace ExpenseTracker.Services
 					Currency = model.Currency.Currency,
 					Abbreviation = model.Currency.Abbreviation,
 					CurrencySymbol = model.Currency.Symbol
-				}
+				},
+
+				Settings = new Settings()
+				{
+					Mode = "light"
+				},
 
 			};
 
@@ -202,6 +207,19 @@ namespace ExpenseTracker.Services
 			}
 			 await userManager.AddToRoleAsync(user, RoleConstants.Employee);
 			 await userManager.AddToRoleAsync(user, RoleConstants.Client);
+
+		}
+
+		public async Task ChangeMode(string mode,string userId)
+		{
+			var user = await this.db.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+			if (user is null)
+			{
+				throw new BadRequestException("Invalid user");
+			}
+			user.Settings.Mode = mode;
+			await this.db.SaveChangesAsync();
 
 		}
 	}

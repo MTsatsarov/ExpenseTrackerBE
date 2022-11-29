@@ -5,6 +5,7 @@ using ExpenseTracker.Services.Models.Products;
 using ExpenseTracker.Services.Models.Storage;
 using ExpenseTracker.Services.Utils.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ExpenseTracker.Services
 {
@@ -56,8 +57,8 @@ namespace ExpenseTracker.Services
 			foreach (var storage in filteredStorages)
 			{
 				string lastUpdate = storage.ModifiedOn != null ?
-					storage.ModifiedOn.Value.ToString("dddd, dd MMMM yyyy") :
-					storage.CreatedOn.ToString("dddd, dd MMMM yyyy");
+					storage.ModifiedOn.Value.ToString("dddd, dd MMMM yyyy",CultureInfo.InvariantCulture) :
+					storage.CreatedOn.ToString("dddd, dd MMMM yyyy", CultureInfo.InvariantCulture);
 
 				products.Add(new CompanyProducts()
 				{
