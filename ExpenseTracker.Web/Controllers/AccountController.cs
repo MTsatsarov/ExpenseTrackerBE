@@ -131,11 +131,14 @@ namespace ExpenseTracker.Web.Controllers
 		[Authorize]
 		public async Task<IActionResult>UpdateUser(UserUpdateModel model)
 		{
+			//check if admin or client
 			var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 			model.Id = userId;
 
-			var result = await this.accountService.UpdateUser(model);		return this.Ok(result);
+			var result = await this.accountService.UpdateUser(model);	
+			return this.Ok(result);
 		}
+
 
 		[HttpPost]
 		[Route("changeThemeMode")]
@@ -152,5 +155,20 @@ namespace ExpenseTracker.Web.Controllers
 
 			return this.Ok();
 		}
+
+		[HttpPost]
+		[Authorize(Roles ="ADMIN")]
+		[Route("confirmUserEmail")]
+		public async Task<IActionResult> ConfirmUserMail ([FromBody]string userId)
+		{
+			if (userId == null)
+			{
+				return this.BadRequest("Id is required");
+			}
+			await this.accountService.ConfirmUserEmail(userId);
+
+			return this.Ok("Email Confirmed");
+		}
+
 	}
 }

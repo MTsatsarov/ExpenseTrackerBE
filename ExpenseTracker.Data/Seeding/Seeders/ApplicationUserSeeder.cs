@@ -33,10 +33,14 @@ namespace ExpenseTracker.Data.Seeding.Seeders
 
 			};
 
-			await userManager.CreateAsync(user, password);
+			var hasUser = await userManager.FindByEmailAsync("Admin@admin.bg");
 
+			if (hasUser is null)
+			{
+				await userManager.CreateAsync(user, password);
+				await userManager.AddToRoleAsync(user, RoleConstants.Admin);
+			}
 
-			await userManager.AddToRoleAsync(user, RoleConstants.Admin);
 		}
 	}
 }
