@@ -168,6 +168,10 @@ namespace ExpenseTracker.Services
 
 			user.FirstName = model.FirstName;
 			user.LastName = model.LastName;
+			user.UserName = model.UserName;
+			user.Email = model.Email;
+			user.PhoneNumber = model.PhoneNumber;
+
 			this.db.Users.Update(user);
 			var result = await this.db.SaveChangesAsync();
 
@@ -196,7 +200,11 @@ namespace ExpenseTracker.Services
 				FirstName = model.FirstName,
 				LastName = model.LastName,
 				Organization = organization,
-				OrganizationId = organization.Id
+				OrganizationId = organization.Id,
+				Settings = new Settings()
+				{
+					Mode="light"
+				}
 			};
 
 			var result = await this.userManager.CreateAsync(user, model.Password);
@@ -219,6 +227,25 @@ namespace ExpenseTracker.Services
 				throw new BadRequestException("Invalid user");
 			}
 			user.Settings.Mode = mode;
+			await this.db.SaveChangesAsync();
+
+		}
+
+		public async Task<IEnumerable<ApplicationUser>> GetAllUsers()
+		{
+			return this.db.Users.ToList();
+		}
+
+		public async Task ConfirmUserEmail(string userId)
+		{
+			var user = await this.db.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+			if(userId is null)
+			{
+				throw new BadRequestException("Invalid user");
+			}
+
+			user.EmailConfirmed = true;
 			await this.db.SaveChangesAsync();
 
 		}
