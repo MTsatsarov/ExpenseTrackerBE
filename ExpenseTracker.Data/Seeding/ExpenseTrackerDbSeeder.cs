@@ -24,7 +24,8 @@ namespace ExpenseTracker.Data.Seeding
             var seeders = new List<ISeeder>
                           {
                               new RoleSeeder(),
-                          };
+                              new ApplicationUserSeeder(),
+						  };
 
             foreach (var seeder in seeders)
             {
