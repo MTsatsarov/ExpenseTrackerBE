@@ -15,6 +15,9 @@ namespace ExpenseTracker.Services.Models.User
 			this.Mode = user.Settings.Mode;
 		}
 		
+		
+
+
 		public IEnumerable<string> Roles { get; set; }
 
 		public string Mode { get; set; }
