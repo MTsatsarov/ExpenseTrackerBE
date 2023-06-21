@@ -35,6 +35,7 @@ namespace ExpenseTracker.Web.Controllers
 		{
 			var userId = this.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 			var organization = await this.organizationService.GetUserOrganization(userId);
+
 			await this.organizationService.AddEmployee(model, organization);
 
 			return this.Ok();
